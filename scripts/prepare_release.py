@@ -43,17 +43,19 @@ def exclude_incompatible_icu():
     print("Excluded incompatible development ICU; Qt will use the Windows system API.")
 
 
-def prepare():
-    exclude_incompatible_icu()
-    source = DEST / "source"
+def prepare(destination=None):
+    destination = Path(destination) if destination else DEST
+    if sys.platform == "win32":
+        exclude_incompatible_icu()
+    source = destination / "source"
     source.mkdir(parents=True, exist_ok=True)
     for name in ["main.py", "README.md", "requirements.txt", "requirements-dev.txt", "build.ps1",
-                 "LICENSE", "THIRD_PARTY.md", "CHANGELOG.md", "验收记录.md"]:
+                 "LICENSE", "THIRD_PARTY.md", "CHANGELOG.md", "验收记录.md", "README.en.md", "build_macos.py"]:
         shutil.copy2(ROOT / name, source / name)
     for name in ["label_editor", "scripts", "tests", "assets", "docs"]:
         shutil.copytree(ROOT / name, source / name, dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns("__pycache__"))
-    notices = DEST / "licenses"
+    notices = destination / "licenses"
     notices.mkdir(exist_ok=True)
     arimo = notices / "Arimo"
     arimo.mkdir(exist_ok=True)
@@ -72,11 +74,12 @@ def prepare():
                     target.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(original, target)
     (notices / "THIRD_PARTY.txt").write_text("\n".join(summary), encoding="utf-8")
-    shutil.copy2(ROOT / "README.md", DEST / "使用说明.md")
+    shutil.copy2(ROOT / "README.md", destination / "README.md")
+    shutil.copy2(ROOT / "README.en.md", destination / "README.en.md")
     for name in ["LICENSE", "THIRD_PARTY.md", "CHANGELOG.md", "验收记录.md"]:
-        shutil.copy2(ROOT / name, DEST / name)
-    shutil.copytree(ROOT / "docs", DEST / "docs", dirs_exist_ok=True)
-    print(DEST)
+        shutil.copy2(ROOT / name, destination / name)
+    shutil.copytree(ROOT / "docs", destination / "docs", dirs_exist_ok=True)
+    print(destination)
 
 
 if __name__ == "__main__":

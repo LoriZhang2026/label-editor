@@ -3,6 +3,8 @@ import json
 from dataclasses import replace
 from pathlib import Path
 import sys
+import platform
+from . import __version__
 
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
@@ -20,7 +22,7 @@ def run(output: str):
     errors = []
     window.show_error = lambda message: errors.append(str(message))
     window.show()
-    result = {"ok": False}
+    result = {"ok": False, "version": __version__, "platform": sys.platform, "architecture": platform.machine()}
 
     def check():
         try:

@@ -84,11 +84,20 @@ def bundled_font_dir():
     return Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1])) / "assets" / "fonts"
 
 
+def system_font_dirs():
+    if sys.platform == "darwin":
+        return [Path("/System/Library/Fonts"), Path("/Library/Fonts"), Path.home() / "Library/Fonts"]
+    if sys.platform == "win32":
+        roots = [Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"]
+        if os.environ.get("LOCALAPPDATA"):
+            roots.append(Path(os.environ["LOCALAPPDATA"]) / "Microsoft/Windows/Fonts")
+        return roots
+    return [Path("/usr/share/fonts"), Path.home() / ".local/share/fonts"]
+
+
 @lru_cache(maxsize=1)
 def local_faces() -> tuple[LocalFace, ...]:
-    roots = [(Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts", "本机同款字体")]
-    if os.environ.get("LOCALAPPDATA"):
-        roots.append((Path(os.environ["LOCALAPPDATA"]) / "Microsoft/Windows/Fonts", "本机同款字体"))
+    roots = [(path, "本机同款字体") for path in system_font_dirs()]
     roots.append((bundled_font_dir(), "内置同款字体"))
     result = []
     for root, source in roots:

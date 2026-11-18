@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 
 from .core import Edit, EditError, PdfSession, SYSTEM_FONTS, TextRun
 from . import __version__
+from .fonts import system_font_dirs
 
 
 STYLE = """
@@ -526,7 +527,8 @@ class MainWindow(QMainWindow):
         self.update_state()
 
     def choose_font(self):
-        path, _ = QFileDialog.getOpenFileName(self, "选择字体", "C:/Windows/Fonts", "字体文件 (*.ttf *.otf *.ttc)")
+        initial = next((p for p in system_font_dirs() if p.is_dir()), Path.home())
+        path, _ = QFileDialog.getOpenFileName(self, "选择字体", str(initial), "字体文件 (*.ttf *.otf *.ttc *.otc)")
         if path:
             index = self.font_combo.findData(path)
             if index < 0:
@@ -721,8 +723,9 @@ def configure_app(app):
     app.setApplicationName("面单工坊")
     app.setOrganizationName("LabelEditor")
     app.setStyle("Fusion")
-    app.setFont(QFont("Microsoft YaHei", 10))
-    app.setStyleSheet(STYLE)
+    family = "PingFang SC" if sys.platform == "darwin" else "Microsoft YaHei"
+    app.setFont(QFont(family, 10))
+    app.setStyleSheet(STYLE.replace("Microsoft YaHei", family))
 
 
 def run_app():

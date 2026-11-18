@@ -16,7 +16,7 @@ def make_pdf(path, rotated=False, embedded=False):
     page.draw_rect(fitz.Rect(15, 40, 260, 65), color=None, fill=(.95, .97, 1))
     font = "helv"
     if embedded:
-        page.insert_font(fontname="custom", fontfile="C:/Windows/Fonts/arial.ttf")
+        page.insert_font(fontname="custom", fontfile=str(Path(__file__).resolve().parents[1] / "assets/fonts/Arimo/Arimo-Regular.ttf"))
         font = "custom"
     page.insert_text((20, 58), "138 0000 1234", fontname=font, fontsize=11)
     page.insert_text((20, 95), "KEEP THIS CONTENT", fontsize=10)
@@ -105,6 +105,7 @@ def test_overflow_and_shrink(session):
     session.apply(run, smaller)
 
 
+@pytest.mark.skipif(not Path("C:/Windows/Fonts/msyh.ttc").exists(), reason="Windows YaHei manual selection")
 def test_missing_glyph_is_explicit_and_replacement_is_supported(session):
     run = number_run(session)
     edit = replace(session.default_edit(run), text="张三")
@@ -232,9 +233,13 @@ def test_chinese_subset_font_reuses_actual_embedded_glyphs(tmp_path):
             assert "收件人：张三" not in check[0].get_text()
             assert check[1].get_pixmap().samples == s.original[1].get_pixmap().samples
         # Previously missing subset glyphs are completed from the same installed face.
-        completed = s.resolve_font(run, replace(edit, text="收件人：龘"))
-        assert completed.source == "本机同款字体"
-        assert "YaHei" in completed.font.name
+        if Path("C:/Windows/Fonts/msyh.ttc").exists():
+            completed = s.resolve_font(run, replace(edit, text="收件人：龘"))
+            assert completed.source == "本机同款字体"
+            assert "YaHei" in completed.font.name
+        else:
+            with pytest.raises(FontUnavailable):
+                s.resolve_font(run, replace(edit, text="收件人：龘"))
     finally:
         s.close()
 
@@ -244,6 +249,7 @@ def test_unmodified_export_is_exact_copy(session, tmp_path):
     assert output.read_bytes() == session.path.read_bytes()
 
 
+@pytest.mark.skipif(not Path("C:/Windows/Fonts/simsun.ttc").exists(), reason="Windows SimSun manual selection")
 def test_reopening_export_does_not_reuse_wrong_font_resource(session, tmp_path):
     run = number_run(session)
     session.apply(run, replace(session.default_edit(run), text="张三", font="yahei", height=25))

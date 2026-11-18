@@ -1,14 +1,26 @@
-# 面单工坊 1.1 · Windows PDF 内容编辑器
+# 面单工坊 1.2 · PDF 内容编辑器
 
-本地运行的 Windows 10 / 11 64 位桌面应用，适合修改文字型电商面单。文件不会上传到服务器。
+**简体中文** | [English](README.en.md)
+
+本地运行的 Windows 与 macOS 桌面应用，适合修改文字型电商面单。文件不会上传到服务器。界面目前为中文，项目介绍与教程提供中英文版本。
 
 ![原字体自动匹配示例](docs/images/auto-font.png)
 
 ## 下载与快速开始
 
-打开 [最新版本下载页](https://github.com/LoriZhang2026/label-editor/releases/latest)，在 **Assets** 中下载 `LabelEditor-Windows-x64-v1.1.0.zip`。GitHub 自动生成的 `Source code` 压缩包是源码，不是可直接运行的程序。
+打开 [最新版本下载页](https://github.com/LoriZhang2026/label-editor/releases/latest)，在 **Assets** 中按电脑类型下载：
 
-解压整个压缩包，打开 `LabelEditor` 文件夹，双击 `LabelEditor.exe`。无需安装 Python，也无需登录账号。
+| 电脑 | 下载文件 |
+| --- | --- |
+| Windows 10 / 11，64 位 | `LabelEditor-Windows-x64-v1.2.0.zip` |
+| Mac，Apple 芯片（M 系列），macOS 15 或更新版本 | `LabelEditor-macOS-arm64-v1.2.0.zip` |
+| Mac，Intel 芯片，macOS 15 或更新版本 | `LabelEditor-macOS-x86_64-v1.2.0.zip` |
+
+GitHub 自动生成的 `Source code` 压缩包是源码，不是可直接运行的程序。
+
+Windows：完整解压，打开 `LabelEditor` 文件夹，双击 `LabelEditor.exe`。Mac：解压后将 `LabelEditor.app` 拖入「应用程序」再打开。无需安装 Python，也无需登录账号。
+
+Mac 版未使用 Apple Developer ID 签名或公证。首次打开可能被 Gatekeeper 拦截，核对来源后参见 [Mac 安装说明](docs/使用指南.md#mac-安装)；无需关闭系统安全功能。
 
 文档：[详细操作步骤](docs/使用指南.md) · [常见问题](docs/常见问题.md) · [更新记录](CHANGELOG.md) · [构建与发布](docs/GitHub发布指南.md)
 
@@ -30,11 +42,13 @@
 
 快捷键：Ctrl+O 打开，Ctrl+S / Ctrl+Shift+S 另存为，Ctrl+Enter 应用，Alt+Left / Alt+Right 撤销/重做文档修改，Ctrl+滚轮缩放。
 
+Mac 对应使用 Command 与 Option 键。
+
 ## 当前支持范围
 
 - 文字型 PDF 中可安全选取的横排文字；支持中文、英文、数字和多页文件，也支持页面整体旋转。
 - 优先复用嵌入字体；子集字形不够时自动寻找同款字体。内置完整 Arimo 的常规、粗体、斜体、粗斜体字库，支持截图中重量字段新增数字、句点及 KG 等字符。字体检测不把 Arial、Helvetica 等相似字体当成 Arimo。
-- 自动识别 Windows 系统及当前用户安装的字体，并正确选择 TTC 字体集合中的对应字体。程序运行时无需联网。
+- 自动识别 Windows 和 macOS 系统及当前用户安装的字体，并正确选择 TTC 字体集合中的对应字体。程序运行时无需联网。
 - 若原字体的完整字库在文件、本机和内置资源中都不存在，则无法凭空生成缺失字形，会明确提示提供该字体，不会静默切换到其他字体。同名字体若存在不同发行版本，仍需对实际 PDF 做视觉核对。
 - 真实移除选中的旧文字并写入新文字，不使用白色矩形覆盖旧文字，不将整个 PDF 转成图片。
 - 原图像和矢量线条不参与文字删除。会阻止新文字与其他文字、图片、深色图形、批注或链接重叠。
@@ -58,6 +72,8 @@ powershell -ExecutionPolicy Bypass -File build.ps1
 ```
 
 编辑引擎：`label_editor/core.py`；界面：`label_editor/ui.py`；回归测试：`tests/`。
+
+在 Mac 上创建虚拟环境并安装相同依赖，执行 `python build_macos.py` 构建当前芯片架构的 `.app`。Mac 使用仓库内的虚构中文示例，不需要安装 Windows 字体。两种 Mac 架构的独立构建由 GitHub Actions 的 `macos.yml` 工作流提供。
 测试覆盖原文件保留、修改区域之外的像素一致性、字体缺字、字体复用、撤销重做、溢出与重叠拦截、加密、多页和页面旋转。
 
 项目源码采用 [GNU AGPL v3](LICENSE)。项目包含 PyMuPDF、PySide6 等第三方组件；各组件遵循其自身许可证。分发包内附第三方许可证及本项目源代码。依赖来源见 [第三方组件说明](THIRD_PARTY.md)。

@@ -1,3 +1,3 @@
-"""A local Windows PDF label editor."""
+"""A local Windows and macOS PDF label editor."""
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"

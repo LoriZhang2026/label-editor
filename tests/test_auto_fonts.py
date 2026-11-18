@@ -5,7 +5,7 @@ from pathlib import Path
 import pymupdf as fitz
 import pytest
 from fontTools import subset
-from fontTools.ttLib import TTFont
+from fontTools.ttLib import TTFont, TTCollection
 from label_editor.core import PdfSession, FontUnavailable
 from label_editor.fonts import bundled_font_dir, identity, local_faces, matches
 
@@ -130,10 +130,27 @@ def test_missing_arimo_char_does_not_switch_to_another_family(tmp_path):
         s.close()
 
 
-def test_automatic_ttc_matching_selects_the_correct_face():
-    faces = [f for f in local_faces() if f.path.name.lower() == "msyh.ttc"]
-    assert len(faces) >= 2
+def test_automatic_ttc_matching_selects_the_correct_face(tmp_path, monkeypatch):
+    from label_editor import fonts
+    collection = TTCollection()
+    collection.fonts = [TTFont(arimo("Regular")), TTFont(arimo("Bold"))]
+    collection.save(tmp_path / "Test.ttc")
+    collection.close()
+    monkeypatch.setattr(fonts, "system_font_dirs", lambda: [tmp_path])
+    local_faces.cache_clear()
+    faces = [f for f in local_faces() if f.path.name == "Test.ttc"]
+    local_faces.cache_clear()
+    assert len(faces) == 2
     second = faces[1]
     result = identity(TTFont(BytesIO(second.read())))
     assert result.family == second.identity.family
-    assert result.family != faces[0].identity.family
+    assert result.weight == 700 and faces[0].identity.weight == 400
+
+
+def test_macos_font_search_roots(monkeypatch):
+    from label_editor import fonts
+    monkeypatch.setattr(fonts.sys, "platform", "darwin")
+    roots = fonts.system_font_dirs()
+    assert Path("/System/Library/Fonts") in roots
+    assert Path("/Library/Fonts") in roots
+    assert Path.home() / "Library/Fonts" in roots

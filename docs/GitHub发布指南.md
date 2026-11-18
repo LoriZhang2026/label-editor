@@ -1,5 +1,17 @@
 # GitHub 发布与维护
 
+**简体中文** | [English](publishing.en.md)
+
+## 1.2.0 跨平台发布
+
+当前版本为 `v1.2.0`。Windows 继续使用 `build.ps1` 与 `scripts/package_release.py`。Mac 需在目标架构的 macOS 上使用 Python 3.12 安装 `requirements-dev.txt`，执行 `python -m pytest -q` 后运行 `python build_macos.py`。Mac 使用已提交的虚构中文示例；无需运行依赖 Windows 字体的 `make_sample.py`。
+
+在 GitHub Actions 中手动运行 **Build and verify macOS**，将分别在 `macos-15`（Apple Silicon）与 `macos-15-intel` 上测试、构建并验证 ZIP 解压后的应用。任务成功后下载 `macOS-arm64`、`macOS-x86_64` 两个构建产物，核对该运行的提交与待发布版本标签一致，再把 ZIP 和校验值上传到 Release。工作流不会自行发布未检查的文件。
+
+Mac 打包使用 `ditto` 保留应用内符号链接与权限，并检查本地临时签名。没有配置 Apple Developer ID 或公证凭据，因此发布说明必须保留首次启动说明。所有下载包都附带中英文文档与对应项目源码。
+
+下方保留首次建立仓库时的 v1.1.0 示例，后续版本应替换为实际版本号。
+
 仓库名称建议为 `label-editor`，公开源码；Windows 运行包放在 Releases 中。当前版本为 `v1.1.0`。
 
 ## 首次连接

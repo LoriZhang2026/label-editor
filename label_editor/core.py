@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from pathlib import Path
 import os
+import sys
 import re
 import tempfile
 from io import BytesIO
@@ -84,6 +85,12 @@ SYSTEM_FONTS = {
     "simhei": ("黑体", FONT_DIR / "simhei.ttf"),
     "arial": ("Arial", FONT_DIR / "arial.ttf"),
 }
+if sys.platform == "darwin":
+    SYSTEM_FONTS = {
+        "pingfang": ("苹方 / PingFang", Path("/System/Library/Fonts/PingFang.ttc")),
+        "songti": ("宋体 / Songti", Path("/System/Library/Fonts/Supplemental/Songti.ttc")),
+        "arial": ("Arial", Path("/System/Library/Fonts/Supplemental/Arial.ttf")),
+    }
 
 
 class PdfSession:
