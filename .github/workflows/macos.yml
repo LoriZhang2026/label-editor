@@ -46,5 +46,11 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: macOS-${{ matrix.architecture }}-verification
-          path: tmp/qa/
+          path: |
+            tmp/qa/macos-bundle/*.json
+            tmp/qa/macos-bundle/*.png
+            tmp/qa/macos-bundle/*.pdf
+            tmp/qa/macos-extracted/*.json
+            tmp/qa/macos-extracted/*.png
+            tmp/qa/macos-extracted/*.pdf
           if-no-files-found: ignore
